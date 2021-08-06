@@ -42,6 +42,6 @@ Population | Census tract population size | ACS
 M-Lab Speed | The average of upload and download speeds performed in speed tests by M-Lab servers | M-Lab
 Number of M-Lab Speed Tests | Total number of M-Lab speed tests conducted per census tract (rolling 12 months) | M-Lab
 Average Minimum Round Trip Time | Round trip time refers to the duration (in milliseconds) from when a browser sends a request to when it receives a response from a server. It is considered to be a performance metric for web applications | M-Lab
-Average Loss Rate | Loss rate from the lifetime of the connection
+Average Loss Rate | Loss rate from the lifetime of the connection | M-Lab
 Fastest Average Broadband Speed measured | Fastest Average (90th Percentile) Download Speed via M-Lab Speed Tests, rolling 12 months | Broadband Now
 
