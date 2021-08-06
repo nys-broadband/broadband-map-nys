@@ -594,15 +594,15 @@ $("#reset-button").click(function() {
     in a census tract. The score creates a single <em>Broadband Score</em> by combining data fields from various datasets
     after analysis & modeling.
     <br>
-    The full data dictionary containing fields used to calculate the score and all fields visualized is available on
-    <a target="_blank" rel="noopener noreferrer"
-      href="https://github.com/nys-broadband/broadband-map-nys">this Github repository
-    </a>.
-    <br>
-    <br>
     Data values in those fields were split into quintiles and thus each census tract received a score of 1-5 based on the
     average of the quintile it fell into for each field. For each variable and the score itself, a lower value indicates
     worse performance and a higher value indicates better performance.
+    <br>
+    <br>
+    The full data dictionary containing fields used to calculate the score and all fields visualized is available on
+    <a target="_blank" rel="noopener noreferrer"
+      href="https://github.com/nys-broadband/broadband-map-nys">this Github repository
+    </a>.              
     <br>
     <br>
     <b>Blank census tracts indicate no Broadband Score due to a lack of data.</b>
