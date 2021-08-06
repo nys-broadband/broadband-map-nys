@@ -129,6 +129,16 @@ function hoverForInstructions() {
       beforeMap.setLayoutProperty('scores_layer', 'visibility','visible');
       afterMap.setLayoutProperty('scores_layer', 'visibility','visible');
   })
+
+  // function to show glimpse of zoomed-in map when user hovers on relevant words in instructions
+  $('#zoom-a-link').hover(function() {
+      afterMap.fitBounds([
+        [-76.50941, 42.43072], // southwestern corner of the bounds
+        [-76.48867, 42.44043] // northeastern corner of the bounds
+      ]);
+    }, function() {
+      afterMap.fitBounds([[-80.00125, 40.40703], [-71.64066, 45.08304]])
+  })
 };
 
 hoverForInstructions(); //call function
@@ -536,8 +546,8 @@ $("#reset-button").click(function() {
   // reset instructions text on left map controls
   document.getElementById("left-controls-title").innerHTML = `About this map`;
   document.getElementById("chart1").innerHTML = `
-  There is no one source of truth for broadband quality. This map compares measures of broadband coverage
-  from various sources and shows an average broadband speed score by New York census tract.<br>
+  There is no one source of truth for broadband quality. This map combines various data sources
+  and shows an average broadband score by New York census tract.<br>
   <br>
   <b>Scores View:</b>
   Click any
@@ -545,7 +555,8 @@ $("#reset-button").click(function() {
   <div class="arrow" id="census-tract-arrow">
     <i style='font-size: 100px' class="fas fa-long-arrow-alt-down"></i>
   </div>
-  to view its broadband and demographic data.
+  to view its broadband and demographic data. Remember to
+  <a id="zoom-a-link">zoom in</a> to see detail down to the land use level!
   <br><b>Comparison View:</b> The FCC collects data from ISPs (Internet Service Providers)
   on the broadband speeds they provide. However these speeds don't always line up with speeds experienced
   by consumers. Display
