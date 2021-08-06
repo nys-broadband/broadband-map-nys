@@ -596,7 +596,7 @@ $("#reset-button").click(function() {
     <br>
     The full data dictionary containing fields used to calculate the score and all fields visualized is available on
     <a target="_blank" rel="noopener noreferrer"
-      href="https://github.com/adr383/Broad-band-State/blob/main/README.md">this Github repository
+      href="https://github.com/nys-broadband/broadband-map-nys">this Github repository
     </a>.
     <br>
     <br>
