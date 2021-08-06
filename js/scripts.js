@@ -279,7 +279,6 @@ function createTable(tractValsObj, percentilesObj, clickedTract, clickedCounty, 
   for (const [key, value] of Object.entries(tractValsObj)) {
     colorMap[key] = getIndexToIns(percentilesObj[`percs_${key}`], value)
   }
-  console.log(colorMap)
 
   var values = [
         Object.keys(tractValsObj).map(x => colName_to_displayVal[x]),
@@ -351,7 +350,6 @@ $("#first-dropdown li a").click(function() {
     combinedarr = firstarr.concat(secondarr);
     var intervals = percentiles(combinedarr);
     createPlot(firstarr, intervals, 'chart1');
-    console.log(intervals);
     beforeMap.setPaintProperty('first_selected_layer', 'fill-color', [
       'step',
       ['get', displayVal_to_colName[first_var]],
@@ -376,7 +374,6 @@ $("#first-dropdown li a").click(function() {
   } else {
     var intervals = percentiles(firstarr);
     createPlot(firstarr, intervals, 'chart1');
-    console.log(intervals);
     beforeMap.setPaintProperty('first_selected_layer', 'fill-color', [
       'step',
       ['get', displayVal_to_colName[first_var]],
@@ -424,7 +421,6 @@ $("#second-dropdown li a").click(function() {
     combinedarr = secondarr.concat(firstarr);
     var intervals = percentiles(combinedarr);
     createPlot(secondarr, intervals, 'chart2');
-    console.log(intervals);
     afterMap.setPaintProperty('second_selected_layer', 'fill-color', [
       'step',
       ['get', displayVal_to_colName[second_var]],
@@ -449,7 +445,6 @@ $("#second-dropdown li a").click(function() {
   } else {
     var intervals = percentiles(secondarr);
     createPlot(secondarr, intervals, 'chart2');
-    console.log(intervals);
     afterMap.setPaintProperty('second_selected_layer', 'fill-color', [
       'step',
       ['get', displayVal_to_colName[second_var]],
@@ -481,7 +476,6 @@ checkbox.addEventListener('change', e => {
       var intervals = percentiles(combinedarr);
       createPlot(firstarr, intervals, 'chart1');
       createPlot(secondarr, intervals, 'chart2');
-      console.log(intervals)
       beforeMap.setPaintProperty('first_selected_layer', 'fill-color', [
         'step',
         ['get', displayVal_to_colName[first_var]],
@@ -506,8 +500,6 @@ checkbox.addEventListener('change', e => {
       intervals_2 = percentiles(secondarr);
       createPlot(firstarr, intervals_1, 'chart1');
       createPlot(secondarr, intervals_2, 'chart2');
-      console.log(intervals_1)
-      console.log(intervals_2)
       beforeMap.setPaintProperty('first_selected_layer', 'fill-color', [
         'step',
         ['get', displayVal_to_colName[first_var]],
@@ -602,7 +594,7 @@ $("#reset-button").click(function() {
     The full data dictionary containing fields used to calculate the score and all fields visualized is available on
     <a target="_blank" rel="noopener noreferrer"
       href="https://github.com/nys-broadband/broadband-map-nys">this Github repository
-    </a>.              
+    </a>.
     <br>
     <br>
     <b>Blank census tracts indicate no Broadband Score due to a lack of data.</b>
@@ -627,6 +619,7 @@ $("#reset-button").click(function() {
 
 // After map loads, get properties for this temporary object from which we will get percentiles
 afterMap.on('load', function() {
+  console.log(afterMap.getStyle().layers)
   sql.execute(`${temp_SQL_qry}`)
       .done(function(data) {
         var rawdata = data.rows;
@@ -639,7 +632,6 @@ afterMap.on('load', function() {
           percentiles_tractClick[`percs_${key}`] = percentiles(value)
         };
         tempObj = {}; // reset tempObj since we don't need to keep it saved
-        console.log(percentiles_tractClick)
       });
 });
 
@@ -781,7 +773,7 @@ async function addCartoLayer() {
         ],
         'fill-opacity': 1
       }
-    }
+    }, 'landuse'
   );
 
   afterMap.addLayer(
@@ -809,7 +801,7 @@ async function addCartoLayer() {
         'fill-opacity': 1
         // 'fill-outline-color': 'black'
       }
-    }
+    }, 'landuse'
   );
 
   beforeMap.addLayer(
@@ -930,7 +922,6 @@ beforeMap.on('load', function() {
     var features = beforeMap.queryRenderedFeatures(e.point, {
         layers: ['scores_layer', 'first_selected_layer']
       });
-    console.log(features)
 
     // Check whether features exist
     if (features.length > 0) {
@@ -1063,7 +1054,6 @@ afterMap.on('load', function() {
       sql.execute(`${tractClick_SQL_qry_broadband}`)
          .done(function(data) {
           window['broadbandTractValues'] = data.rows[0];
-          console.log(broadbandTractValues);
           // create table with plotly HERE using broadbandTractValues and percentilesObject as input
           createTable(broadbandTractValues, percentiles_tractClick, clickedTract, clickedCounty, 'chart1');
         });
@@ -1071,7 +1061,6 @@ afterMap.on('load', function() {
       sql.execute(`${tractClick_SQL_qry_demog}`)
          .done(function(data) {
           window['demogTractValues'] = data.rows[0];
-          console.log(demogTractValues);
           // create table with plotly HERE using broadbandTractValues and percentilesObject as input
           createTable(demogTractValues, percentiles_tractClick, clickedTract, clickedCounty, 'chart2');
         });
