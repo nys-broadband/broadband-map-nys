@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+  <head>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <script src="https://libs.cartocdn.com/mapbox-gl/v1.13.0/mapbox-gl.js"></script>
+    <link href="https://libs.cartocdn.com/mapbox-gl/v1.13.0/mapbox-gl.css" rel="stylesheet" />
+    <link href = "https://code.jquery.com/ui/1.10.4/themes/ui-darkness/jquery-ui.css" rel = "stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <!-- TESTING -->
+    <link rel="stylesheet" href="//libs.cartocdn.com/cartodb.js/v3/3.15/themes/css/cartodb.css" />
+    <script src="//libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
+    <!-- TESTING -->
+    <link rel="stylesheet" href="css/styles.css">
+  </head>
+
+  <body>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true"
+    data-backdrop="static" data-keyboard="false">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Important note</h5>
+          </div>
+          <div class="modal-body">
+            To create this map, data at various spatial levels (eg. zip code, census block) were aggregated to the census tract level
+            and tract values estimated. The limitations of this method are potential data quality issues, as well as missing
+            information for some census tracts.
+          </div>
+          <div class="modal-footer">
+            <div class="form-check" style='align-self: left'>
+              <input class="form-check-input" type="checkbox" value="" id="modal-checkbox">
+              <label class="form-check-label" for="flexCheckDisabled" style='font-size: 13px'>
+                I have read and understood the limitations of the data
+              </label>
+            </div>
+            <button type="button" class="btn btn-outline-secondary" id='modal-dismiss' disabled data-dismiss="modal">Explore map</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id='sidenav-menu'>
+      <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+      <!-- Default text when user first loads page - brief context and instructions -->
+      <p class='sidenav-menu-text'> <span style='text-align: center; font-size: 20px; color: #f1f1f1;'>Quick Start</span><br><br>
+        Default text when page first loads - brief context and instructions. Legend for scores that are visible on screen and description of how they were calculated.
+      </p>
+    </div>
+
+    <!-- Text for each menu button -->
+    <div id='context-menu-button-text' style="display:none;"> <span style='float: right; margin-top: -33px; font-size: 20px; color: #f1f1f1;'>Context</span><br>
+      Background info on the need for this map; context on current state broadband coverage mapping efforts and limitations.
+    </div>
+
+    <div id='about-menu-button-text' style="display:none;"> <span style='float: right; margin-top: -33px; font-size: 20px; color: #f1f1f1;'>About</span><br>
+      Data sources used to create this map.
+    </div>
+
+    <div id='usemap-menu-button-text' style="display:none;"> <span style='float: right; margin-top: -33px; font-size: 20px; color: #f1f1f1;'>Instructions</span><br>
+      How to use map - broad instructions - slide, hover, click to show all info for that tract maybe?
+    </div>
+
+    <div id='filter-menu-button-text' style="display:none;"> <span style='float: right; margin-top: -33px; font-size: 20px; color: #f1f1f1;'>Map Controls</span><br>
+      Buttons to select which variables to view (can view 1 (choropleth color map) or 2 (color and height of tract shows values of each variable for that tract))<br>
+      Filters to adjust map view for various variables (slide selection)<br>
+    </div>
+
+    <div id='legend-menu-button-text' style="display:none;"> <span style='float: right; margin-top: -33px; font-size: 20px; color: #f1f1f1;'>Legend</span><br>
+      Legend - possibly dynamic, depending on layer the user is viewing
+    </div>
+
+
+      <div id='comparison-container'>
+
+        <div id="before" class="map"></div>
+        <div id="after" class="map"></div>
+
+        <div class='my-legend'>
+          <div class='legend-title'>Broadband Score</div>
+          <div class='legend-scale'>
+            <ul class='legend-labels'>
+              <li><span style='background:#ca0020;'></span>1</li>
+              <li><span style='background:#f4a582;'></span>2</li>
+              <li><span style='background:#ffffbf;'></span>3</li>
+              <li><span style='background:#abdda4;'></span>4</li>
+              <li><span style='background:#0571b0;'></span>5</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- <div id='sidenav-buttons'>
+          <button class="sidenav-button" id="context-menu-button" onclick="openNav()" >
+            <span class='original'>Why</span>
+            <span id='context-onhover' class='onhover'>Why explore this map?</span>
+          </button>
+          <button class="sidenav-button" id="about-menu-button" onclick="openNav()" >
+            <span class='original'>What</span>
+            <span class='onhover'>What am I looking at?</span>
+          </button>
+          <button class="sidenav-button" id="usemap-menu-button" onclick="openNav()" >
+            <span class='original'>How</span>
+            <span class='onhover'>How to use this map</span>
+          </button>
+          <button class="sidenav-button" id="filter-menu-button" onclick="openNav()" >
+            <span class='original'>Controls</span>
+            <span class='onhover'>Controls to change map view</span>
+          </button>
+          <button class="sidenav-button" id="legend-menu-button" onclick="openNav()" >
+            <span class='original'>Legend</span>
+            <span class='onhover'>Legend</span>
+          </button>
+        </div> -->
+
+        <!-- Map controls for filtering map data -->
+        <div id='map-controls-left' class='map-controls'>
+          <div class='map-controls-content'>
+            <h4 id='left-controls-title'>About this map</h4>
+            <!-- <div class="arrow" id="test"> <i class="far fa-arrow-alt-circle-right"></i> </div> -->
+            <div class="chart" id='chart1'>
+              <!-- to be populated when user selects first var -->
+              There is no one source of truth for broadband quality. This map compares measures of broadband coverage
+              from various sources and shows an average broadband speed score by New York census tract.<br>
+              <br>
+              <b>Scores View:</b>
+              <!-- Use the
+              <a id="address-box-a-link">address lookup</a>
+              <div class="arrow" id="address-box-arrow">
+                <i style='font-size: 100px' class="fas fa-long-arrow-alt-down"></i>
+              </div>
+              to find an address of interest.  -->
+              Click any
+              <a id="census-tract-a-link">census tract</a>
+              <div class="arrow" id="census-tract-arrow">
+                <i style='font-size: 100px' class="fas fa-long-arrow-alt-down"></i>
+              </div>
+              to view its broadband and demographic data.
+              <br><b>Comparison View:</b> The FCC collects data from ISPs (Internet Service Providers)
+              on the broadband speeds they provide. However these speeds don't always line up with speeds experienced
+              by consumers. Display
+              <a id="split-left-a-link">ISP-reported broadband speeds on the left</a>
+              <div class="arrow" id="split-left-arrow">
+                <i style='font-size: 80px' class="fas fa-long-arrow-alt-left"></i>
+              </div>
+              of the map and corresponding
+              <a id="split-right-a-link">measured speeds on the right</a>
+              <div class="arrow" id="split-right-arrow">
+                <i style='font-size: 80px' class="fas fa-long-arrow-alt-right"></i>
+              </div>
+              , then
+              <a id="slide-a-link">slide to compare</a>
+              <div class="arrow" id="slide-arrow">
+                <i style='font-size: 80px' class="fas fa-long-arrow-alt-left"></i>
+                <i style='font-size: 80px' class="fas fa-long-arrow-alt-right"></i>
+              </div>
+              these speeds across the state. Use
+               <a id="checkbox-a-link">this checkbox</a>
+               <div class="arrow" id="checkbox-arrow">
+                 <i style='font-size: 80px' class="fas fa-long-arrow-alt-right"></i>
+               </div>
+               to apply the same values to colors on both sides of the map.
+               <a id="scores-view-a-link">Return to the scores view</a>
+               <div class="arrow" id="scores-view-arrow">
+                 <i style='font-size: 80px' class="fas fa-long-arrow-alt-left"></i>
+               </div>
+              at any time.
+            </div>
+            <div class="dropdown">
+              <button class="btn btn-outline-secondary dropdown-toggle" id='left-button' type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Split map left
+              </button>
+              <div class="dropdown-menu" id="first-dropdown" aria-labelledby="dropdownMenuButton">
+                <li><a class="dropdown-item" href="#">FCC Download Speed</a></li>
+                <li><a class="dropdown-item" href="#">FCC Upload Speed</a></li>
+              </div>
+            </div>
+            <button class="btn btn-outline-secondary btn-sm" id='reset-button' type="button">
+              Reset map/Show Scores
+            </button>
+          </div>
+        </div>
+
+        <div id='map-controls-right' class='map-controls'>
+          <div class='map-controls-content'>
+            <h4 id='right-controls-title'>Broadband Score</h4>
+            <div class="chart" id='chart2'>
+              A scoring system was developed to provide a single metric that captures the overall performance and accessibility of broadband
+              in a census tract. The score creates a single <em>Broadband Score</em> by combining data fields from various datasets
+              after analysis & modeling.
+              <br>
+              The data fields used to calculate the score and their descriptions are available on
+              <a target="_blank" rel="noopener noreferrer"
+                href="https://github.com/adr383/Broad-band-State/blob/main/README.md">this Github repository
+              </a>.
+              <br>
+              <br>
+              Data values in those fields were split into quintiles and thus each census tract received a score of 1-5 based on the
+              average of the quintile it fell into for each field. For each variable and the score itself, a lower value indicates
+              worse performance and a higher value indicates better performance.
+              <br>
+              <br>
+              <b>Blank census tracts indicate no Broadband Score due to a lack of data.</b>
+            </div>
+            <div class='my-legend' id="broadband-legend">
+              <div class='legend-title'>Broadband/Demographic Data</div>
+              <div class='legend-scale'>
+                <ul class='legend-labels'>
+                  <li><span style='background:#ca002080;'></span>bottom</li>
+                  <li><span style='background:#f4a58280;'></span></li>
+                  <li><span style='background:#ffffbf80;'></span>middle percentile</li>
+                  <li><span style='background:#abdda480;'></span></li>
+                  <li><span style='background:#0571b080;'></span>top</li>
+                </ul>
+              </div>
+            </div>
+            <div class="dropdown">
+              <button class="btn btn-outline-secondary dropdown-toggle" id='right-button' type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Split map right
+              </button>
+              <div class="dropdown-menu" id="second-dropdown" aria-labelledby="dropdownMenuButton">
+                <li><a class="dropdown-item" href="#">Ookla Download Speed</a></li>
+                <li><a class="dropdown-item" href="#">Ookla Upload Speed</a></li>
+                <!-- <li><a class="dropdown-item" href="#">M-Lab Throughput</a></li> -->
+              </div>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="" id="checkbox" checked disabled>
+              <label class="form-check-label" for="flexCheckDisabled" style='font-size: 13.5px; font-style: italic'>
+                Show both sides of map on same scale
+              </label>
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16" data-toggle="tooltip" data-placement="top" data-html="true" title="Use for apples-to-apples comparison of broadband speeds from different sources">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+
+    <!-- TESTING GEOCODER -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.min.js"></script>
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.css" type="text/css">
+    <!-- <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script> -->
+    <!-- LEAFLET Geocoder-->
+    <!-- Include Carto.js -->
+    <script src="https://cartodb-libs.global.ssl.fastly.net/carto.js/v4.0.0-beta.4/carto.min.js"></script>
+    <!-- Include Leaflet -->
+    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
+    <link href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <!-- TESTING GEOCODER-->
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.4.0/mapbox-gl-compare.js"></script>
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-compare/v0.4.0/mapbox-gl-compare.css" type="text/css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://kit.fontawesome.com/37a64de4b3.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.plot.ly/plotly-2.1.0.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="js/scripts.js"></script>
+
+  </body>
+
+
+</html>
