@@ -2,7 +2,7 @@
 
 This map was created for the Summer 2021 Capstone Program at New York University's Center for Urban Science &amp; Progress.
 
-### Team members: \
+### Team members:
 Kelsey Nanan\
 Aleka Raju\
 AJ Kuhn
